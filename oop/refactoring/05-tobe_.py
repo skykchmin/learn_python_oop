@@ -1,15 +1,18 @@
-# 3번 User가 많은 행위를 책임지고 있다. Store가 판매하는 책임을 가져야한다
-
 from abc import ABC, abstractclassmethod
 from dataclasses import dataclass
 
+@dataclass
+class Product:
+    name: str
+    price: int
+    
 class Store(ABC):
     
     @abstractclassmethod
     def __init__(self):
-        self.money = 0
+        self._money = 0
         self.name = ""
-        self.products = {}
+        self._products = {}
 
     @abstractclassmethod
     def show_product(self, product_id):
@@ -97,7 +100,7 @@ class User:
     def purchase_product(self, product_id):
         product = self.see_product(product_id)
         price = product["price"]
-        if self._money >= product["price"]:
+        if self._check_money_enough(price=price):
             self._give_money(money=price)
             try:
                 my_product = self.store.sell_product(product_id, money = price)
@@ -118,11 +121,14 @@ class User:
     def _add_belong(self, product):
         self.belongs.append(product) # List에 값을 추가
 
+    def _check_money_enough(self, price):
+        return self._money >= price
+
 if __name__ == "__main__":
     store = EricStore(
         products={
-            1: {"name": "키보드", "price": 30000},
-            2: {"name": "모니터", "price": 50000},
+            1: Product(name = "키보드", price = 30000),
+            2: Product(name = "모니터", price = 50000)
         }
     )
 
